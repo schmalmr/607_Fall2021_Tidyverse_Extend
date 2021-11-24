@@ -1,15 +1,20 @@
 ---
 title: "TidyVerse Create and Extend Vignette"
 output:
+  pdf_document: 
+    toc: yes
+    latex_engine: xelatex
+  word_document:
+    toc: yes
   html_document:
     theme: cerulean
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
 ---
 
-### Title: CUNY SPS MDS DATA607_Tyderverse Create & Extend"
-### Author: Charles Ugiagbe (Create) and Mark Schmalfeld (Extend)
-### Date: "10/23/2021 and 11/23/2021"
+### Title: "CUNY SPS MDS DATA607_Tyderverse Create & Extend"
+### Author: "Charles Ugiagbe (create) and Mark Schmalfeld (extend)"
+### Date: "11/23/2021"
 
 
 ```{r global_options, include=FALSE, message=FALSE, warning=FALSE}
@@ -58,12 +63,13 @@ data <- read.csv(url, header = TRUE)
 ```
 
 
-```{r}
+```{r data header}
 head(data)
 ```
 
 Glimpse help us to catch sight of the data to see the data structure.
-```{r}
+
+```{r glimpse data}
 glimpse(data)
 ```
 
@@ -72,9 +78,7 @@ glimpse(data)
 rename() changes the names of individual variables using in a column with a new one
 
 
-
-
-```{r}
+```{r rename col}
 data1 <- data %>% rename(race = race.ethnicity, parental_Educatn_level= parental.level.of.education, test.prep = test.preparation.course)
 head(data1)
 ```
@@ -83,12 +87,12 @@ head(data1)
 
 Select(): is use for selecting a range of consecutive variables or taking the complement of a set of variables
 
-```{r}
+```{r selection initial example}
 data2 <- data1 %>%
   select(gender, math.score, reading.score, writing.score)
 head(data2)
 ```
-```{r}
+```{r select examples}
 data2b<- data1 %>%
   select( gender,test.prep,math.score,reading.score,writing.score)
 head(data2b)
@@ -97,25 +101,22 @@ tail(data2b)
 
 
 
-
-
 ##   dplyr::filter()
 
-I use the filter() function to filter maths, writing and reading scores that are greater than 97
+I use the filter() function to filter maths, writing and reading scores that are greater than 95
 
-```{r}
+```{r filter examples}
 data3 <- data2 %>%
   filter(math.score == 100, writing.score > 95, reading.score > 95)
 data3
 ```
 
 
-
 ##    dplyr::arrange()
 
 arrange(): orders the rows of a data frame by the values of selected columns.
 
-```{r}
+```{r arrange examples}
 data4 <- data2 %>% arrange(desc(math.score))
 head(data4)
 ```
@@ -124,7 +125,7 @@ head(data4)
 
 mutate() adds new variables that are function of the existing ones to the table and also preserves existing ones.
 
-```{r}
+```{r mutate examples}
 data5 <- data4 %>%
   mutate(avg.score = (math.score + writing.score + reading.score) / 3)
 head(data5)
@@ -135,11 +136,10 @@ head(data5)
 
 ```
 
-##       dplyr::case_when() 
+## dplyr::case_when() 
+Case_when: Function allows you to vectorize multiple if_else() statements. It is an R equivalent of a SQL CASE WHEN statement. 
 
-case_when: function allows you to vectorise multiple if_else() statements. It is an R equivalent of the SQL CASE WHEN statement. If no cases match
-
-```{r}
+```{r data mutate}
 data6 <- data5 %>% 
   mutate(pass_fail_grade = case_when(avg.score >= 85 ~ 'Pass'
                                      ,TRUE ~ 'Fail' )
@@ -149,7 +149,7 @@ head(data6)
 
 ##    dplyr::summarize() 
 
-```{r}
+```{r ggplot summarize}
 data %>% group_by(gender) %>%
   summarize( math_score = sum (math.score)/ n())
 
@@ -162,14 +162,14 @@ data %>% group_by(parental.level.of.education) %>%
 
 ggplot2 is a system for 'declaratively' creating graphics, based on "The Grammar of Graphics".
 
-```{r}
+```{r distribution plot}
 ggplot(data = data6, aes(x = gender, y = avg.score, col = gender), col = red) + geom_boxplot() + labs(title="Distribution of Students Average score") + theme(plot.title = element_text(hjust=0.5))
 ```
 
-ggplot2 system has many different plot designs that you can create using the appropriate geom_type for the plot.  Below are two simple examples to create a scatter plot evaluation the relationship between reading and math scores by gender (with linear correlation model line using geom_smooth) and a histogram plot of the math scores.
 
+##### ggplot2 system has many different plot designs that you can create using the appropriate geom_type for the plot.  Below are two simple examples to create a scatter plot evaluation the relationship between reading and math scores by gender (with linear correlation model line using geom_smooth) and a histogram plot of the math scores.
 
-```{r}
+```{r ggplot2 scatter plot with smooth line and histogram}
 ggplot(data = data1, aes(x = reading.score, y= math.score, col = gender), col = red) + geom_point() + labs(title="Scatter plot of math score vs reading score by student gender") + theme(plot.title = element_text(hjust=0.5))+geom_smooth(method=lm)
 
 ggplot(data = data1, aes(x = math.score), col = red) + geom_histogram(binwidth = 5) + labs(title="Histogram of math scores") + theme(plot.title = element_text(hjust=0.5))
@@ -180,8 +180,7 @@ ggplot(data = data1, aes(x = math.score), col = red) + geom_histogram(binwidth =
 
 ##   map() function use from purrr 
  
-Use of the purr Map function to calculate the mean vs a traditional approach
-
+Use of the purr Map function to calculate the mean vs a traditional approach.
 
 
 ```{r traditional mean calculation for scores and in this case example is filtered by gender}
